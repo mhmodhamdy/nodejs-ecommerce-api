@@ -11,7 +11,7 @@ const globalError = require('./middleware/errorMiddleware');
 
 dotenv.config({ path: 'config.env' });
 
-//connect with database 
+//connect with database
 dbConnection();
 //ExpressApp
 const app = express();
