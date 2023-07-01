@@ -2,6 +2,7 @@ const { check } = require('express-validator');
 
 const validatorMiddleware = require('../../middleware/validatorMiddleware');
 const categoryModel = require('../../models/categoryModel');
+const subCategoryModel = require('../../models/subCategoryModel');
 
 exports.createProductValidator = [
   check('title')
@@ -58,7 +59,19 @@ exports.createProductValidator = [
         }
       })
     ),
-  check('subCategory').optional().isMongoId().withMessage('invalid id format'),
+  check('subCategories')
+    .optional()
+    .isMongoId()
+    .withMessage('invalid id format')
+    .custom((subCategoriesIds) =>
+      subCategoryModel
+        .find({ _id: { $exists: true, $in: subCategoriesIds } })
+        .then((result) => {
+          if (result.length < 1 || result.length !== subCategoriesIds) {
+            return Promise.reject(new Error('Invalid sub categories ids'));
+          }
+        })
+    ),
   check('brand').optional().isMongoId().withMessage('invalid id format'),
   check('ratingAvarege')
     .optional()
