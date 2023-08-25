@@ -63,6 +63,7 @@ exports.createProductValidator = [
     .optional()
     .isMongoId()
     .withMessage('Invalid ID formate')
+    //check if all my req subcategories ids in database or not
     .custom((subcategoriesIds) =>
       SubCategory.find({ _id: { $exists: true, $in: subcategoriesIds } }).then(
         (result) => {
@@ -72,6 +73,7 @@ exports.createProductValidator = [
         }
       )
     )
+    //combination all subcategories ids which belong to the category in the req in one array
     .custom((val, { req }) =>
       SubCategory.find({ category: req.body.category }).then(
         (subcategories) => {
@@ -79,7 +81,7 @@ exports.createProductValidator = [
           subcategories.forEach((subCategory) => {
             subCategoriesIdsInDB.push(subCategory._id.toString());
           });
-          // check if subcategories ids in db include subcategories in req.body (true)
+          // check if subcategories ids in in the created array include subcategories in req.body (true)
           const checker = (target, arr) => target.every((v) => arr.includes(v));
           if (!checker(val, subCategoriesIdsInDB)) {
             return Promise.reject(

@@ -3,11 +3,15 @@ const asyncHandler = require('express-async-handler');
 const Product = require('../models/productModel');
 const ApiError = require('../utils/apiError');
 
-exports.getProducts = asyncHandler(async (req, res) => {
+exports.getProducts = asyncHandler(async (req, res, next) => {
+  console.log(req.query);
   const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 3;
+  const limit = req.query.limit * 1 || 5;
   const skip = (page - 1) * limit;
-  const products = await Product.find({})
+  const products = await Product.find({
+    price: req.query.price,
+    sold: req.query.sold,
+  })
     .skip(skip)
     .limit(limit)
     .populate({ path: 'category', select: 'name -_id' });
