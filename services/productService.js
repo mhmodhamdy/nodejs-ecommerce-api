@@ -9,9 +9,13 @@ exports.getProducts = asyncHandler(async (req, res, next) => {
   const limit = req.query.limit * 1 || 5;
   const skip = (page - 1) * limit;
   const products = await Product.find({
-    price: req.query.price,
-    sold: req.query.sold,
+    // price: req.query.price,
+    // sold: req.query.sold,
   })
+    .where('price')
+    .equals(req.query.price)
+    .where('sold')
+    .equals(req.query.sold)
     .skip(skip)
     .limit(limit)
     .populate({ path: 'category', select: 'name -_id' });
