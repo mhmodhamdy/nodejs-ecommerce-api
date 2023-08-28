@@ -3,6 +3,7 @@ const asyncHandler = require('express-async-handler');
 const Brand = require('../models/brandModel');
 const ApiError = require('../utils/apiError');
 const ApiFeatures = require('../utils/apiFeatures');
+const { deleteOne } = require('./handlersFactory');
 
 exports.getBrands = asyncHandler(async (req, res) => {
   const doucumentCount = await Brand.countDocuments();
@@ -49,14 +50,4 @@ exports.updateBrand = asyncHandler(async (req, res, next) => {
   res.json({ stutes: 'succes', data: brand });
 });
 
-exports.deleteBrand = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const brand = await Brand.findOneAndDelete({ _id: id });
-  if (!brand) {
-    return next(new ApiError('No Brand Found', 404));
-  }
-  res.json({
-    stutes: 'succes',
-    msg: 'Brand Deleted',
-  });
-});
+exports.deleteBrand = deleteOne(Brand);

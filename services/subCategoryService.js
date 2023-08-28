@@ -4,6 +4,8 @@ const SubCategory = require('../models/subCategoryModel');
 const ApiError = require('../utils/apiError');
 const ApiFeatures = require('../utils/apiFeatures');
 
+const { deleteOne } = require('./handlersFactory');
+
 // Nested route
 // GET /api/v1/categories/:categoryId/subcategories
 exports.createFilterObj = (req, res, next) => {
@@ -72,14 +74,4 @@ exports.updateSubCategory = asyncHandler(async (req, res, next) => {
   res.json({ data: subCategory });
 });
 
-exports.deleteSubCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const subCategory = await SubCategory.findOneAndDelete({ _id: id });
-  if (!subCategory) {
-    return next(new ApiError('No subCategory Found', 404));
-  }
-  res.json({
-    stutes: 'Success',
-    msg: 'SubCategory Deleted',
-  });
-});
+exports.deleteSubCategory = deleteOne(SubCategory);

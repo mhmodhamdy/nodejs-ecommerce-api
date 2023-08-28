@@ -4,6 +4,8 @@ const Category = require('../models/categoryModel');
 const ApiError = require('../utils/apiError');
 const ApiFeatures = require('../utils/apiFeatures');
 
+const { deleteOne } = require('./handlersFactory');
+
 exports.getCategories = asyncHandler(async (req, res) => {
   const doucumentCount = await Category.countDocuments();
   const apiFeatures = new ApiFeatures(Category.find(), req.query)
@@ -49,14 +51,4 @@ exports.updateCategory = asyncHandler(async (req, res, next) => {
   res.json({ stutes: 'succes', data: category });
 });
 
-exports.deleteCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const category = await Category.findOneAndDelete({ _id: id });
-  if (!category) {
-    return next(new ApiError('No Category Found', 404));
-  }
-  res.json({
-    stutes: 'succes',
-    msg: 'Category Deleted',
-  });
-});
+exports.deleteCategory = deleteOne(Category);

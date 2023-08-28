@@ -4,6 +4,8 @@ const Product = require('../models/productModel');
 const ApiError = require('../utils/apiError');
 const ApiFeatures = require('../utils/apiFeatures');
 
+const { deleteOne } = require('./handlersFactory');
+
 exports.getProducts = asyncHandler(async (req, res, next) => {
   const doucumentCount = await Product.countDocuments();
   const apiFeatures = new ApiFeatures(Product.find(), req.query)
@@ -57,14 +59,4 @@ exports.updateProduct = asyncHandler(async (req, res, next) => {
   res.json({ stutes: 'succes', data: product });
 });
 
-exports.deleteProduct = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const product = await Product.findOneAndDelete({ _id: id });
-  if (!product) {
-    return next(new ApiError('No Product Found', 404));
-  }
-  res.json({
-    stutes: 'succes',
-    msg: 'Product Deleted',
-  });
-});
+exports.deleteProduct = deleteOne(Product);
