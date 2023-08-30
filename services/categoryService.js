@@ -1,3 +1,6 @@
+const multer = require('multer');
+const { v4: uuidv4 } = require('uuid');
+
 const Category = require('../models/categoryModel');
 
 const {
@@ -7,6 +10,21 @@ const {
   getOne,
   getAll,
 } = require('./handlersFactory');
+
+const multerStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/categories');
+  },
+  filename: function (req, file, cb) {
+    const extName = file.mimetype.split('/')[1];
+    const filename = `category-${uuidv4()}-${Date.now()}.${extName}`;
+    cb(null, filename);
+  },
+});
+
+const upload = multer({ storage: multerStorage });
+
+exports.uploadCategoryImage = upload.single('image');
 
 // @desc    Get all categories
 exports.getCategories = getAll(Category);
