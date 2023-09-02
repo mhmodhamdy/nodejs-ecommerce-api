@@ -19,7 +19,7 @@ exports.uploadBrandImage = uploadSingleImage('image');
 exports.resizeImage = asyncHandler(async (req, res, next) => {
   const fileName = `brand-${uuidv4()}-${Date.now()}.jpeg`;
   await sharp(req.file.buffer)
-    .resize(800, 600)
+    .resize(600, 600)
     .toFormat('jpeg')
     .jpeg({ quality: 80 })
     .toFile(`uploads/brands/${fileName}`);
