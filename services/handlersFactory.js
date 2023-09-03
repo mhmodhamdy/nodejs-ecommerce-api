@@ -8,7 +8,7 @@ exports.getOne = (Model) =>
     const { id } = req.params;
     const doucument = await Model.findById(id);
     if (!doucument) {
-      return next(new ApiError("No doucument Found", 404));
+      return next(new ApiError('No doucument Found', 404));
     }
     res.json({ data: doucument });
   });
@@ -40,7 +40,7 @@ exports.getAll = (Model, modelName = '') =>
 exports.createOne = (Model) =>
   asyncHandler(async (req, res) => {
     const newDoucument = await Model.create(req.body);
-    res.json({ stutes: "succes", data: newDoucument });
+    res.json({ stutes: 'succes', data: newDoucument });
   });
 
 exports.deleteOne = (Model) =>
@@ -48,11 +48,11 @@ exports.deleteOne = (Model) =>
     const { id } = req.params;
     const doucument = await Model.findOneAndDelete({ _id: id });
     if (!doucument) {
-      return next(new ApiError("No doucument Found", 404));
+      return next(new ApiError('No doucument Found', 404));
     }
     res.json({
-      stutes: "succes",
-      msg: "Brand Deleted",
+      stutes: 'succes',
+      msg: 'Deleted',
     });
   });
 
@@ -62,7 +62,7 @@ exports.updateOne = (Model) =>
       new: true,
     });
     if (!doucument) {
-      return next(new ApiError("No doucument Found", 404));
+      return next(new ApiError('No doucument Found', 404));
     }
-    res.json({ stutes: "succes", data: doucument });
+    res.json({ stutes: 'succes', data: doucument });
   });
