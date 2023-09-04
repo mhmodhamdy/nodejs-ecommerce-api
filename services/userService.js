@@ -1,16 +1,12 @@
 const sharp = require('sharp');
 const asyncHandler = require('express-async-handler');
 const { v4: uuidv4 } = require('uuid');
+const bcrypt = require('bcryptjs');
 
-const {
-  deleteOne,
-  updateOne,
-  createOne,
-  getOne,
-  getAll,
-} = require('./handlersFactory');
+const { deleteOne, createOne, getOne, getAll } = require('./handlersFactory');
 const { uploadSingleImage } = require('../middleware/uploadImageMiddleware');
 const User = require('../models/userModel');
+const ApiError = require('../utils/apiError');
 
 // upload single image
 exports.uploadUserImage = uploadSingleImage('profileImage');
@@ -37,6 +33,40 @@ exports.getUser = getOne(User);
 // @desc    Create new User
 exports.createUser = createOne(User);
 // @desc    Update existing User
-exports.updateUser = updateOne(User);
+exports.updateUser = asyncHandler(async (req, res, next) => {
+  const doucument = await User.findByIdAndUpdate(
+    req.params.id,
+    {
+      name: req.body.name,
+      slug: req.body.slug,
+      email: req.body.email,
+      phone: req.body.phone,
+      profileImage: req.body.profileImage,
+      role: req.body.role,
+    },
+    {
+      new: true,
+    }
+  );
+  if (!doucument) {
+    return next(new ApiError('No doucument Found', 404));
+  }
+  res.json({ stutes: 'succes', data: doucument });
+});
+exports.changeUserPassword = asyncHandler(async (req, res, next) => {
+  const doucument = await User.findByIdAndUpdate(
+    req.params.id,
+    {
+      password: await bcrypt.hash(req.body.password, 12),
+    },
+    {
+      new: true,
+    }
+  );
+  if (!doucument) {
+    return next(new ApiError('No doucument Found', 404));
+  }
+  res.json({ stutes: 'succes', data: doucument });
+});
 // @desc    Delete an existing User
 exports.deleteUser = deleteOne(User);
