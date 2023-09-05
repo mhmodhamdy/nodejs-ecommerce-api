@@ -4,7 +4,7 @@ const { signUpValidator } = require('../utils/validators/authValidator');
 
 const router = express.Router();
 
-router.route('/').post(signUpValidator, signUp);
+router.route('/signup').post(signUpValidator, signUp);
 
 // router
 //   .route('/:id')

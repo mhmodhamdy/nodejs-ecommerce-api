@@ -16,7 +16,7 @@ exports.signUp = asyncHandler(async (req, res, next) => {
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
     expiresIn: process.env.JWT_EXPIRE_TIME,
   });
-  res.statusCode(201).json({ data: user, token });
+  res.status(201).json({ data: user, token });
 
   next();
 });
