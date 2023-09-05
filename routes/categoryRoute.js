@@ -15,6 +15,8 @@ const {
   createCategoryValidator,
 } = require('../utils/validators/categoryValidator');
 
+const { authorization } = require('../services/authService');
+
 const subCategoriesRoute = require('./subCategoryRoute');
 
 const router = express.Router();
@@ -25,6 +27,7 @@ router
   .route('/')
   .get(getCategories)
   .post(
+    authorization,
     uploadCategoryImage,
     resizeImage,
     createCategoryValidator,

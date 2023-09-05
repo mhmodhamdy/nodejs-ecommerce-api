@@ -66,7 +66,7 @@ exports.changeUserPassword = asyncHandler(async (req, res, next) => {
   if (!doucument) {
     return next(new ApiError('No doucument Found', 404));
   }
-  res.json({ stutes: 'succes', data: doucument });
+  res.status(201).json({ stutes: 'succes', data: doucument });
 });
 // @desc    Delete an existing User
 exports.deleteUser = deleteOne(User);

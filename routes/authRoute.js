@@ -1,10 +1,14 @@
 const express = require('express');
-const { signUp } = require('../services/authService');
-const { signUpValidator } = require('../utils/validators/authValidator');
+const { signUp, login } = require('../services/authService');
+const {
+  signUpValidator,
+  loginValidator,
+} = require('../utils/validators/authValidator');
 
 const router = express.Router();
 
 router.route('/signup').post(signUpValidator, signUp);
+router.route('/login').post(loginValidator, login);
 
 // router
 //   .route('/:id')
