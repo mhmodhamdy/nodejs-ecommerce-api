@@ -2,6 +2,7 @@ const sharp = require('sharp');
 const asyncHandler = require('express-async-handler');
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcryptjs');
+const _ = require('lodash');
 
 const { deleteOne, createOne, getOne, getAll } = require('./handlersFactory');
 const { uploadSingleImage } = require('../middleware/uploadImageMiddleware');
@@ -36,14 +37,15 @@ exports.createUser = createOne(User);
 exports.updateUser = asyncHandler(async (req, res, next) => {
   const doucument = await User.findByIdAndUpdate(
     req.params.id,
-    {
-      name: req.body.name,
-      slug: req.body.slug,
-      email: req.body.email,
-      phone: req.body.phone,
-      profileImage: req.body.profileImage,
-      role: req.body.role,
-    },
+    _.pick(req.body, [
+      'name',
+      'slug',
+      'email',
+      'phone',
+      'profileImage',
+      'role',
+    ]),
+
     {
       new: true,
     }

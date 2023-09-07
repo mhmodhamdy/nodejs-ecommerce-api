@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const _ = require('lodash');
 
 const ApiError = require('../utils/apiError');
 const User = require('../models/userModel');
@@ -12,11 +13,9 @@ const generateToken = (payload) =>
 
 exports.signUp = asyncHandler(async (req, res, next) => {
   // create User
-  const user = await User.create({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-  });
+  const user = await User.create(
+    _.pick(req.body, ['name', 'email', 'password'])
+  );
 
   //generate token
   const token = generateToken(user._id);
@@ -26,15 +25,15 @@ exports.signUp = asyncHandler(async (req, res, next) => {
 });
 
 exports.login = asyncHandler(async (req, res, next) => {
-  //find the user by their email address and compare passwords
+  // Find the user by their email address and compare passwords
   const user = await User.findOne({ email: req.body.email });
   if (!user || !(await bcrypt.compare(req.body.password, user.password))) {
     return next(new ApiError('incorrect email or password', 401));
   }
+
+  // If they match return a JWT token for them to use in future requests
   const token = generateToken(user._id);
   res.status(200).json({ data: user, token });
-
-  //if they match return a JWT token for them to use in future requests
 });
 
 exports.authorization = asyncHandler(async (req, res, next) => {
@@ -53,21 +52,15 @@ exports.authorization = asyncHandler(async (req, res, next) => {
   const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
   // Check if user exist
-  const user = await User.findById(decoded.userId);
-  if (!user) {
+  const currentUser = await User.findById(decoded.userId);
+  if (!currentUser) {
     return next(new ApiError('No user found', 400));
   }
   // Check if user cheanged his password after generating token
-  if (user.passwordChangedAt) {
+  if (currentUser.passwordChangedAt) {
     const passChangedTimestamp = parseInt(
-      user.passwordChangedAt.getTime() / 1000,
+      currentUser.passwordChangedAt.getTime() / 1000,
       10
-    );
-    console.log(
-      'password changed at',
-      passChangedTimestamp,
-      'current time',
-      Math.floor(Date.now() / 1000)
     );
     // Password changed after token generated (Error)
     if (passChangedTimestamp > decoded.iat) {
@@ -75,8 +68,17 @@ exports.authorization = asyncHandler(async (req, res, next) => {
         new ApiError('Password has been changed, login again please', 403)
       );
     }
-
-    req.user = user;
-    next();
   }
+  req.user = currentUser;
+  next();
 });
+exports.allowedTo = (...roles) =>
+  asyncHandler(async (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      console.log(req.user.role);
+      return next(
+        new ApiError('you are not allowed to access this route', 403)
+      );
+    }
+    next();
+  });

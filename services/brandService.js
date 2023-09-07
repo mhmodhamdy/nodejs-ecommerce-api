@@ -18,14 +18,17 @@ exports.uploadBrandImage = uploadSingleImage('image');
 // image processing with sharp package
 exports.resizeImage = asyncHandler(async (req, res, next) => {
   const fileName = `brand-${uuidv4()}-${Date.now()}.jpeg`;
-  await sharp(req.file.buffer)
-    .resize(600, 600)
-    .toFormat('jpeg')
-    .jpeg({ quality: 80 })
-    .toFile(`uploads/brands/${fileName}`);
+  if (req.file) {
+    await sharp(req.file.buffer)
+      .resize(600, 600)
+      .toFormat('jpeg')
+      .jpeg({ quality: 80 })
+      .toFile(`uploads/brands/${fileName}`);
 
-  // Save images in database
-  req.body.image = fileName;
+    // Save images in database
+    req.body.image = fileName;
+  }
+
   next();
 });
 // @desc    Get all brands

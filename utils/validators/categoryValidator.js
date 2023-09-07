@@ -11,9 +11,9 @@ exports.createCategoryValidator = [
   check('name')
     .notEmpty()
     .withMessage('Category name required')
-    .isLength({ min: 3 })
+    .isLength({ min: 1 })
     .withMessage('Too short category name')
-    .isLength({ max: 32 })
+    .isLength({ max: 256 })
     .withMessage('Too long category name')
     .custom((val, { req }) => {
       req.body.slug = slugify(val);

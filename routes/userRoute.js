@@ -16,6 +16,7 @@ const {
   createUserValidator,
   changeUserPasswordValidator,
 } = require('../utils/validators/userValidator');
+const { authorization, allowedTo } = require('../services/authService');
 
 const router = express.Router();
 
@@ -26,9 +27,16 @@ router
 
 router
   .route('/:id')
-  .get(getUserValidator, getUser)
-  .put(uploadUserImage, resizeImage, updateUserValidator, updateUser)
-  .delete(deleteUserValidator, deleteUser);
+  .get(authorization, allowedTo('admin'), getUserValidator, getUser)
+  .put(
+    authorization,
+    allowedTo('admin'),
+    uploadUserImage,
+    resizeImage,
+    updateUserValidator,
+    updateUser
+  )
+  .delete(authorization, allowedTo('admin'), deleteUserValidator, deleteUser);
 
 router
   .route('/changepassword/:id')
