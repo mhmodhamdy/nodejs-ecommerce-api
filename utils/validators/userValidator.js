@@ -125,3 +125,17 @@ exports.changeUserPasswordValidator = [
     }),
   validatorMiddleware,
 ];
+exports.updateLoggedUserPasswordValidator = [
+  check('password')
+    .notEmpty()
+    .withMessage('please enter the new password')
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 character')
+    .custom((password, { req }) => {
+      if (password !== req.body.confirmPassword) {
+        throw new ApiError("Confirm password doesn't match new password", 422);
+      }
+      return true;
+    }),
+  validatorMiddleware,
+];

@@ -60,3 +60,18 @@ exports.loginValidator = [
     .withMessage('Password must be at least 6 character'),
   validatorMiddleware,
 ];
+exports.resetPasswordValidator = [
+  check('email').isEmail().withMessage('Invalid Email Address'),
+  check('newPassword')
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 character')
+    .custom((newPassword, { req }) => {
+      if (newPassword !== req.body.confirmPassword) {
+        throw new Error(
+          'New Password and Confirm New Password does not matched'
+        );
+      }
+      return true;
+    }),
+  validatorMiddleware,
+];

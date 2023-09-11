@@ -15,7 +15,7 @@ const {
   createCategoryValidator,
 } = require('../utils/validators/categoryValidator');
 
-const { authorization, allowedTo } = require('../services/authService');
+const { auth, allowedTo } = require('../services/authService');
 
 const subCategoriesRoute = require('./subCategoryRoute');
 
@@ -27,7 +27,7 @@ router
   .route('/')
   .get(getCategories)
   .post(
-    authorization,
+    auth,
     allowedTo('maneger', 'admin'),
     uploadCategoryImage,
     resizeImage,
@@ -39,7 +39,7 @@ router
   .route('/:id')
   .get(getCategoryValidator, getCategory)
   .put(
-    authorization,
+    auth,
     allowedTo('maneger', 'admin'),
     uploadCategoryImage,
     resizeImage,
@@ -47,7 +47,7 @@ router
     updateCategory
   )
   .delete(
-    authorization,
+    auth,
     allowedTo('maneger', 'admin'),
     deleteCategoryValidator,
     deleteCategory

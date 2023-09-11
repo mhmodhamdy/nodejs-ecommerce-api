@@ -8,6 +8,7 @@ const { deleteOne, createOne, getOne, getAll } = require('./handlersFactory');
 const { uploadSingleImage } = require('../middleware/uploadImageMiddleware');
 const User = require('../models/userModel');
 const ApiError = require('../utils/apiError');
+const generateToken = require('../utils/generateToken');
 
 // upload single image
 exports.uploadUserImage = uploadSingleImage('profileImage');
@@ -33,6 +34,8 @@ exports.getUsers = getAll(User);
 exports.getUser = getOne(User);
 // @desc    Create new User
 exports.createUser = createOne(User);
+// @desc    Delete an existing User
+exports.deleteUser = deleteOne(User);
 // @desc    Update existing User
 exports.updateUser = asyncHandler(async (req, res, next) => {
   const doucument = await User.findByIdAndUpdate(
@@ -55,6 +58,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   }
   res.json({ stutes: 'succes', data: doucument });
 });
+// @desc    Change user password
 exports.changeUserPassword = asyncHandler(async (req, res, next) => {
   const doucument = await User.findByIdAndUpdate(
     req.params.id,
@@ -71,5 +75,25 @@ exports.changeUserPassword = asyncHandler(async (req, res, next) => {
   }
   res.status(201).json({ stutes: 'succes', data: doucument });
 });
-// @desc    Delete an existing User
-exports.deleteUser = deleteOne(User);
+// @desc    Get logged user data
+exports.getLoggedUserData = asyncHandler(async (req, res, next) => {
+  req.params.id = req.user._id;
+  next();
+});
+// @desc    Update logged user password
+exports.updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      password: await bcrypt.hash(req.body.password, 12),
+      passwordChangedAt: Date.now(),
+    },
+    {
+      new: true,
+    }
+  );
+
+  const token = generateToken(user._id);
+
+  res.status(200).json({ data: user, token });
+});
