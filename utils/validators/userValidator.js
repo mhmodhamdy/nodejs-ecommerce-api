@@ -1,4 +1,4 @@
-const { check, body } = require('express-validator');
+const { check } = require('express-validator');
 const { default: slugify } = require('slugify');
 const bcrypt = require('bcryptjs');
 
@@ -58,15 +58,14 @@ exports.createUserValidator = [
 
 exports.updateUserValidator = [
   check('id').isMongoId().withMessage('Invalied User ID Format'),
-  body('name')
+  check('name')
     .optional()
     .custom((val, { req }) => {
       req.body.slug = slugify(val);
       return true;
     }),
   check('email')
-    .notEmpty()
-    .withMessage('Email required')
+    .optional()
     .isEmail()
     .withMessage('Invalid Email Address')
     .custom((val) =>
@@ -137,5 +136,30 @@ exports.updateLoggedUserPasswordValidator = [
       }
       return true;
     }),
+  validatorMiddleware,
+];
+exports.updateLoggedUserValidator = [
+  check('name')
+    .optional()
+    .custom((name, { req }) => {
+      req.body.slug = slugify(name);
+      return true;
+    }),
+  check('email')
+    .optional()
+    .isEmail()
+    .withMessage('Invalid Email Address')
+    .custom((val) =>
+      User.findOne({ email: val }).then((user) => {
+        if (user) {
+          return Promise.reject(new Error('E-mail already exists'));
+        }
+      })
+    ),
+  check('phone')
+    .optional()
+    .isMobilePhone(['ar-EG', 'ar-SA', 'ar-AE', 'ar-BH', 'ar-IQ'])
+    .withMessage('Invalied phone number'),
+  check('profileImage').optional(),
   validatorMiddleware,
 ];

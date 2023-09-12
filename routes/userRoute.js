@@ -10,6 +10,9 @@ const {
   changeUserPassword,
   getLoggedUserData,
   updateLoggedUserPassword,
+  updateLoggedUserData,
+  deactiveLoggedUser,
+  reactiveLoggedUser,
 } = require('../services/userService');
 const {
   getUserValidator,
@@ -18,41 +21,73 @@ const {
   createUserValidator,
   changeUserPasswordValidator,
   updateLoggedUserPasswordValidator,
+  updateLoggedUserValidator,
 } = require('../utils/validators/userValidator');
-const { auth, allowedTo, checking } = require('../services/authService');
+const {
+  authorization,
+  allowedTo,
+  checking,
+} = require('../services/authService');
 
 const router = express.Router();
 
-router.get('/getme', auth, getLoggedUserData, getUser);
+// router.use(authorization);
+
+router.get('/getme', authorization, getLoggedUserData, getUser);
 router.put(
   '/changemypassword',
-  auth,
   checking('password'),
   checking('confirmPassword'),
+  authorization,
   updateLoggedUserPasswordValidator,
   updateLoggedUserPassword
 );
+router.put(
+  '/updateme',
+  authorization,
+  updateLoggedUserValidator,
+  updateLoggedUserData
+);
+router.delete('/deactiveme', authorization, deactiveLoggedUser);
+router.put(
+  '/reactiveme',
+  checking('email'),
+  checking('password'),
+  reactiveLoggedUser
+);
 
+// users routes
 router
   .route('/')
-  .get(auth, allowedTo('maneger', 'admin'), getUsers)
-  .post(uploadUserImage, resizeImage, createUserValidator, createUser);
+  .get(allowedTo('maneger', 'admin'), authorization, getUsers)
+  .post(
+    uploadUserImage,
+    resizeImage,
+    authorization,
+    createUserValidator,
+    createUser
+  );
 
+// router.use(allowedTo('admin'));
+router
+  .route('/changepassword/:id')
+  .put(
+    allowedTo('admin'),
+    authorization,
+    changeUserPasswordValidator,
+    changeUserPassword
+  );
 router
   .route('/:id')
-  .get(auth, allowedTo('admin'), getUserValidator, getUser)
+  .get(allowedTo('maneger', 'admin'), authorization, getUserValidator, getUser)
   .put(
-    auth,
     allowedTo('admin'),
+    authorization,
     uploadUserImage,
     resizeImage,
     updateUserValidator,
     updateUser
   )
-  .delete(auth, allowedTo('admin'), deleteUserValidator, deleteUser);
-
-router
-  .route('/changepassword/:id')
-  .put(changeUserPasswordValidator, changeUserPassword);
+  .delete(allowedTo('admin'), authorization, deleteUserValidator, deleteUser);
 
 module.exports = router;

@@ -39,14 +39,17 @@ exports.login = asyncHandler(async (req, res, next) => {
   if (!user || !(await bcrypt.compare(req.body.password, user.password))) {
     return next(new ApiError('incorrect email or password', 401));
   }
-
+  // Check if account active or not
+  if (!user.active) {
+    return next(new ApiError('Account not activated', 403));
+  }
   // If they match return a JWT token for them to use in future requests
   const token = generateToken(user._id);
   res.status(200).json({ data: user, token });
 });
 
 // Authentication
-exports.auth = asyncHandler(async (req, res, next) => {
+exports.authorization = asyncHandler(async (req, res, next) => {
   // Get token if it exist
   let token;
   if (
@@ -58,13 +61,17 @@ exports.auth = asyncHandler(async (req, res, next) => {
   if (!token) {
     return next(new ApiError('Unauthorized, frist login and come back', 401));
   }
-  // Verify token if changed or expired
+  // 2) Verify token (no change happens, expired token)
   const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
   // Check if user exist
   const currentUser = await User.findById(decoded.userId);
   if (!currentUser) {
     return next(new ApiError('No user found', 400));
+  }
+  // Check if user active or deactive
+  if (!currentUser.active) {
+    return next(new ApiError('This user is not active', 403));
   }
   // Check if user cheanged his password after generating token
   if (currentUser.passwordChangedAt) {
@@ -89,7 +96,7 @@ exports.auth = asyncHandler(async (req, res, next) => {
 // Authorization
 exports.allowedTo = (...roles) =>
   asyncHandler(async (req, res, next) => {
-    if (!roles.includes(_.pick(req.user, 'role'))) {
+    if (!roles.includes(req.user.role)) {
       return next(
         new ApiError('you are not allowed to access this route', 403)
       );
