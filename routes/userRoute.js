@@ -23,11 +23,8 @@ const {
   updateLoggedUserPasswordValidator,
   updateLoggedUserValidator,
 } = require('../utils/validators/userValidator');
-const {
-  authorization,
-  allowedTo,
-  checking,
-} = require('../services/authService');
+const checkField = require('../utils/checkField');
+const { authorization, allowedTo } = require('../services/authService');
 
 const router = express.Router();
 
@@ -36,8 +33,8 @@ const router = express.Router();
 router.get('/getme', authorization, getLoggedUserData, getUser);
 router.put(
   '/changemypassword',
-  checking('password'),
-  checking('confirmPassword'),
+  checkField('password'),
+  checkField('confirmPassword'),
   authorization,
   updateLoggedUserPasswordValidator,
   updateLoggedUserPassword
@@ -51,8 +48,8 @@ router.put(
 router.delete('/deactiveme', authorization, deactiveLoggedUser);
 router.put(
   '/reactiveme',
-  checking('email'),
-  checking('password'),
+  checkField('email'),
+  checkField('password'),
   reactiveLoggedUser
 );
 

@@ -10,14 +10,6 @@ const User = require('../models/userModel');
 const sendEmail = require('../utils/sendEmail');
 const generateToken = require('../utils/generateToken');
 
-exports.checking = (arg) =>
-  asyncHandler(async (req, res, next) => {
-    if (!_.hasIn(req.body, arg)) {
-      return next(new ApiError(`please enter your ${arg}`), 500);
-    }
-    next();
-  });
-
 // Registering
 exports.signUp = asyncHandler(async (req, res, next) => {
   // create User
@@ -31,7 +23,6 @@ exports.signUp = asyncHandler(async (req, res, next) => {
 
   next();
 });
-
 // Login
 exports.login = asyncHandler(async (req, res, next) => {
   // Find the user by their email address and compare passwords
@@ -47,7 +38,6 @@ exports.login = asyncHandler(async (req, res, next) => {
   const token = generateToken(user._id);
   res.status(200).json({ data: user, token });
 });
-
 // Authentication
 exports.authorization = asyncHandler(async (req, res, next) => {
   // Get token if it exist
@@ -103,7 +93,7 @@ exports.allowedTo = (...roles) =>
     }
     next();
   });
-
+// Forget my password and send reset code to my gmail
 exports.forgetPassword = asyncHandler(async (req, res, next) => {
   // Check if email exist or not
   const user = await User.findOne(_.pick(req.body, 'email'));
@@ -150,7 +140,7 @@ exports.forgetPassword = asyncHandler(async (req, res, next) => {
     message: 'reset code sent to email',
   });
 });
-
+// Check if reset code correct or false
 exports.verifyResetCode = asyncHandler(async (req, res, next) => {
   // Hashing reset code
   const hashedResetCode = crypto
@@ -174,7 +164,7 @@ exports.verifyResetCode = asyncHandler(async (req, res, next) => {
     status: 'Success',
   });
 });
-
+// Reset password if the reset code correct
 exports.resetPassword = asyncHandler(async (req, res, next) => {
   // Find a user by their Email and update it's password field using req body data from frontend
   const user = await User.findOne(_.pick(req.body, 'email'));

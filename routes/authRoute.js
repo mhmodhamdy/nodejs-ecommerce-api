@@ -1,6 +1,5 @@
 const express = require('express');
 const {
-  checking,
   signUp,
   login,
   forgetPassword,
@@ -12,19 +11,20 @@ const {
   loginValidator,
   resetPasswordValidator,
 } = require('../utils/validators/authValidator');
+const checkField = require('../utils/checkField');
 
 const router = express.Router();
 
 router
   .post('/signup', signUpValidator, signUp)
   .post('/login', loginValidator, login)
-  .post('/forgetpassword', checking('email'), forgetPassword)
-  .post('/verifyresetcode', checking('resetCode'), verifyResetCode)
+  .post('/forgetpassword', checkField('email'), forgetPassword)
+  .post('/verifyresetcode', checkField('resetCode'), verifyResetCode)
   .put(
     '/resetpassword',
-    checking('email'),
-    checking('newPassword'),
-    checking('confirmPassword'),
+    checkField('email'),
+    checkField('newPassword'),
+    checkField('confirmPassword'),
     resetPasswordValidator,
     resetPassword
   );
