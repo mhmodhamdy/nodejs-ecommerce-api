@@ -112,7 +112,7 @@ exports.deactiveLoggedUser = asyncHandler(async (req, res, next) => {
   res.status(200).json({ status: 'Success', message: 'Account Deactiveted' });
 });
 // @desc    Reactive user
-exports.reactiveLoggedUser = asyncHandler(async (req, res, next) => {
+exports.reactiveUser = asyncHandler(async (req, res, next) => {
   const user = await User.findOne(_.pick(req.body, 'email'));
   if (!user || !(await bcrypt.compare(req.body.password, user.password))) {
     return next(new ApiError('incorrect email or password', 401));

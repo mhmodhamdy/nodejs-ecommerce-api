@@ -12,7 +12,7 @@ const {
   updateLoggedUserPassword,
   updateLoggedUserData,
   deactiveLoggedUser,
-  reactiveLoggedUser,
+  reactiveUser,
 } = require('../services/userService');
 const {
   getUserValidator,
@@ -23,7 +23,7 @@ const {
   updateLoggedUserPasswordValidator,
   updateLoggedUserValidator,
 } = require('../utils/validators/userValidator');
-const checkField = require('../utils/checkField');
+const checkFieldValidator = require('../utils/validators/checkFieldValidator');
 const { authorization, allowedTo } = require('../services/authService');
 
 const router = express.Router();
@@ -33,8 +33,8 @@ const router = express.Router();
 router.get('/getme', authorization, getLoggedUserData, getUser);
 router.put(
   '/changemypassword',
-  checkField('password'),
-  checkField('confirmPassword'),
+  checkFieldValidator('password'),
+  checkFieldValidator('confirmPassword'),
   authorization,
   updateLoggedUserPasswordValidator,
   updateLoggedUserPassword
@@ -48,22 +48,16 @@ router.put(
 router.delete('/deactiveme', authorization, deactiveLoggedUser);
 router.put(
   '/reactiveme',
-  checkField('email'),
-  checkField('password'),
-  reactiveLoggedUser
+  checkFieldValidator('email'),
+  checkFieldValidator('password'),
+  reactiveUser
 );
 
 // users routes
 router
   .route('/')
   .get(allowedTo('maneger', 'admin'), authorization, getUsers)
-  .post(
-    uploadUserImage,
-    resizeImage,
-    authorization,
-    createUserValidator,
-    createUser
-  );
+  .post(uploadUserImage, resizeImage, createUserValidator, createUser);
 
 // router.use(allowedTo('admin'));
 router
@@ -76,7 +70,7 @@ router
   );
 router
   .route('/:id')
-  .get(allowedTo('maneger', 'admin'), authorization, getUserValidator, getUser)
+  .get(allowedTo('manager', 'admin'), authorization, getUserValidator, getUser)
   .put(
     allowedTo('admin'),
     authorization,

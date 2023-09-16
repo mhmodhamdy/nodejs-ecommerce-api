@@ -1,8 +1,8 @@
 const _ = require('lodash');
 const asyncHandler = require('express-async-handler');
-const ApiError = require('./apiError');
+const ApiError = require('../apiError');
 
-const checkField = (arg) =>
+const checkFieldValidator = (arg) =>
   asyncHandler(async (req, res, next) => {
     if (!_.hasIn(req.body, arg)) {
       return next(new ApiError(`please enter your ${arg}`), 500);
@@ -10,4 +10,4 @@ const checkField = (arg) =>
     next();
   });
 
-module.exports = checkField;
+module.exports = checkFieldValidator;

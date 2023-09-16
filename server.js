@@ -10,6 +10,7 @@ const categoryRoute = require('./routes/categoryRoute');
 const brandRoute = require('./routes/brandRoute');
 const userRoute = require('./routes/userRoute');
 const authRoute = require('./routes/authRoute');
+const reviewRoute = require('./routes/reviewRoute');
 const productRoute = require('./routes/productRoute');
 const subCategoryRoute = require('./routes/subCategoryRoute');
 
@@ -38,6 +39,7 @@ app.use('/api/v1/brands', brandRoute);
 app.use('/api/v1/products', productRoute);
 app.use('/api/v1/users', userRoute);
 app.use('/api/v1/auth', authRoute);
+app.use('/api/v1/reviews', reviewRoute);
 
 app.all('*', (req, res, next) => {
   //const err = new Error(`can't find this route: ${req.originalUrl}`)

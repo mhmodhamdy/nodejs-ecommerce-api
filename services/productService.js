@@ -2,7 +2,6 @@ const { v4: uuidv4 } = require('uuid');
 const sharp = require('sharp');
 const expressAsyncHandler = require('express-async-handler');
 
-
 const Product = require('../models/productModel');
 const {
   deleteOne,
@@ -54,7 +53,7 @@ exports.resizeProductImage = expressAsyncHandler(async (req, res, next) => {
 // @desc    Get all products
 exports.getProducts = getAll(Product, 'Products');
 // @desc    Create a product
-exports.getProduct = getOne(Product);
+exports.getProduct = getOne(Product, 'reviews');
 // @desc    Update a product by id
 exports.createProduct = createOne(Product);
 /* @desc    Delete one product from the database using its ID 

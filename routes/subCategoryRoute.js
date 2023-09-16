@@ -25,7 +25,7 @@ router
   .get(createFilterObj, getSubCategories)
   .post(
     authorization,
-    allowedTo('maneger', 'admin'),
+    allowedTo('manager', 'admin'),
     setCategoryIdToBody,
     createSubCategoryValidator,
     createSubCategory
@@ -35,7 +35,7 @@ router
   .get(getSubCategoryValidator, getSubCategory)
   .put(
     authorization,
-    allowedTo('maneger', 'admin'),
+    allowedTo('manager', 'admin'),
     updateSubCategoryValidator,
     updateSubCategory
   )

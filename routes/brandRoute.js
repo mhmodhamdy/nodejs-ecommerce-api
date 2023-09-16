@@ -23,7 +23,7 @@ router
   .get(getBrands)
   .post(
     authorization,
-    allowedTo('maneger', 'admin'),
+    allowedTo('manager', 'admin'),
     uploadBrandImage,
     resizeImage,
     createBrandValidator,
@@ -35,7 +35,7 @@ router
   .get(getBrandValidator, getBrand)
   .put(
     authorization,
-    allowedTo('maneger', 'admin'),
+    allowedTo('manager', 'admin'),
     uploadBrandImage,
     resizeImage,
     updateBrandValidator,

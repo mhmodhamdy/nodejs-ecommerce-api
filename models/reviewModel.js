@@ -9,6 +9,7 @@ const reviewSchema = new mongoose.Schema(
       type: Number,
       min: [1, 'Rating must be greater than 0'],
       max: [5, "Rating can't exceed more then five"],
+      required: [true, 'Review rating required'],
     },
     user: {
       type: mongoose.Schema.ObjectId,
@@ -23,5 +24,10 @@ const reviewSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+reviewSchema.pre(/^find/, function (next) {
+  this.populate({ path: 'user', select: 'name' });
+  next();
+});
 
 module.exports = mongoose.model('Review', reviewSchema);

@@ -23,7 +23,7 @@ router
   .get(getProducts)
   .post(
     authorization,
-    allowedTo('maneger', 'admin'),
+    allowedTo('manager', 'admin'),
     uploadProductImages,
     resizeProductImage,
     createProductValidator,
@@ -35,7 +35,7 @@ router
   .get(getProductValidator, getProduct)
   .put(
     authorization,
-    allowedTo('maneger', 'admin'),
+    allowedTo('manager', 'admin'),
     uploadProductImages,
     resizeProductImage,
     updateProductValidator,

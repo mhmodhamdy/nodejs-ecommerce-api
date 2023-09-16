@@ -71,7 +71,7 @@ const productSchema = new mongoose.Schema(
       default: 0,
     },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
 //mongoose query middleware
@@ -81,6 +81,12 @@ productSchema.pre(/^find/, function (next) {
     select: 'name',
   });
   next();
+});
+
+productSchema.virtual('reviews', {
+  ref: 'Review', //reference model name
+  localField: '_id', // local field in product schema
+  foreignField: 'product', // foreign key in review schema
 });
 
 const setImageUrl = (doc) => {

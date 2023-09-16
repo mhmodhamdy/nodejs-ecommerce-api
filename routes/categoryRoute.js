@@ -28,7 +28,7 @@ router
   .get(getCategories)
   .post(
     authorization,
-    allowedTo('maneger', 'admin'),
+    allowedTo('manager', 'admin'),
     uploadCategoryImage,
     resizeImage,
     createCategoryValidator,
@@ -40,7 +40,7 @@ router
   .get(getCategoryValidator, getCategory)
   .put(
     authorization,
-    allowedTo('maneger', 'admin'),
+    allowedTo('manager', 'admin'),
     uploadCategoryImage,
     resizeImage,
     updateCategoryValidator,
@@ -48,7 +48,7 @@ router
   )
   .delete(
     authorization,
-    allowedTo('maneger', 'admin'),
+    allowedTo('manager', 'admin'),
     deleteCategoryValidator,
     deleteCategory
   );

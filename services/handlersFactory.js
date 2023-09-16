@@ -3,14 +3,19 @@ const asyncHandler = require('express-async-handler');
 const ApiError = require('../utils/apiError');
 const ApiFeatures = require('../utils/apiFeatures');
 
-exports.getOne = (Model) =>
+exports.getOne = (Model, populateOpt) =>
   asyncHandler(async (req, res, next) => {
     const { id } = req.params;
-    const doucument = await Model.findById(id);
+    // Build query
+    let query = Model.findById(id);
+    if (populateOpt) {
+      query = query.populate(populateOpt);
+    }
+    const doucument = await query;
     if (!doucument) {
       return next(new ApiError('No doucument Found', 404));
     }
-    res.json({ data: doucument });
+    res.status(200).json({ data: doucument });
   });
 
 exports.getAll = (Model, modelName = '') =>
