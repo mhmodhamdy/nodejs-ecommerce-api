@@ -45,7 +45,7 @@ exports.getAll = (Model, modelName = '') =>
 exports.createOne = (Model) =>
   asyncHandler(async (req, res) => {
     const newDoucument = await Model.create(req.body);
-    res.json({ stutes: 'succes', data: newDoucument });
+    res.status(201).json({ stutes: 'succes', data: newDoucument });
   });
 
 exports.deleteOne = (Model) =>
@@ -55,6 +55,8 @@ exports.deleteOne = (Model) =>
     if (!doucument) {
       return next(new ApiError('No doucument Found', 404));
     }
+    // Trigger remove event when update doucument
+    doucument.deleteOne();
     res.json({
       stutes: 'succes',
       msg: 'Deleted',
@@ -69,5 +71,7 @@ exports.updateOne = (Model) =>
     if (!doucument) {
       return next(new ApiError('No doucument Found', 404));
     }
+    // Trigger save event when update doucument
+    doucument.save();
     res.json({ stutes: 'succes', data: doucument });
   });

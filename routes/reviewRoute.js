@@ -5,24 +5,35 @@ const {
   createReview,
   updateReview,
   deleteReview,
+  createFilterObj,
+  setProductIdAndUserIdToBody,
+  setLoggedUserId,
 } = require('../services/reviewService');
 const {
+  getReviewValidator,
   updateReviewValidator,
   createReviewValidator,
   deleteReviewValidator,
 } = require('../utils/validators/reviewValidator');
 const { authorization, allowedTo } = require('../services/authService');
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 router
   .route('/')
-  .get(getReviews)
-  .post(authorization, allowedTo('user'), createReviewValidator, createReview);
+  .get(createFilterObj, getReviews)
+  .post(
+    authorization,
+    allowedTo('user'),
+    setProductIdAndUserIdToBody,
+    setLoggedUserId,
+    createReviewValidator,
+    createReview
+  );
 
 router
   .route('/:id')
-  .get(getReview)
+  .get(getReviewValidator, getReview)
   .put(authorization, allowedTo('user'), updateReviewValidator, updateReview)
   .delete(
     authorization,

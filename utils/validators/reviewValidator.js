@@ -21,10 +21,13 @@ exports.createReviewValidator = [
   check('user')
     .isMongoId()
     .withMessage('Invalied Review ID Format')
-    .custom(async (id) => {
+    .custom(async (id, { req }) => {
       const user = await User.findById(id);
       if (!user) {
-        throw new Error('User not found');
+        throw new ApiError('User not found');
+      }
+      if (req.body.user !== req.user._id) {
+        throw new ApiError("You can't review other users");
       }
     }),
   check('product')
@@ -75,7 +78,7 @@ exports.deleteReviewValidator = [
         throw new ApiError('Incorrect Review Id');
       }
       if (req.user.role === 'user') {
-        if (review.user.toString() !== req.user._id.toString()) {
+        if (review.user._id.toString() !== req.user._id.toString()) {
           throw new ApiError('You are not allowed to delete this review');
         }
       }
