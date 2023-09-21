@@ -1,12 +1,24 @@
 const express = require('express');
 
-const { addProductToCart } = require('../services/cartService');
+const {
+  addProductToCart,
+  getLoggedUserCart,
+  removeItemFromCart,
+  updateCartItemQuantity,
+  applyCoupon,
+} = require('../services/cartService');
 const { authorization, allowedTo } = require('../services/authService');
 
 const router = express.Router();
 router.use(authorization, allowedTo('admin', 'user'));
 
-router.route('/').post(addProductToCart);
-// router.route('/:id').get(getCoupon).put(updateCoupon).delete(deleteCoupon);
+router.route('/').get(getLoggedUserCart).post(addProductToCart);
+router.put('/applycoupon', applyCoupon);
+
+router
+  .route('/:itemId')
+  // .get(getCoupon)
+  .put(updateCartItemQuantity)
+  .delete(removeItemFromCart);
 
 module.exports = router;

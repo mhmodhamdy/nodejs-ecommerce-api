@@ -30,8 +30,9 @@ reviewSchema.pre(/^find/, function (next) {
   this.populate({ path: 'user', select: 'name' });
   next();
 });
-reviewSchema.post('save', function () {
+reviewSchema.pre(/^create/, function (next) {
   this.populate({ path: 'user', select: 'name' });
+  next();
 });
 
 reviewSchema.statics.calcAvaregeRatingAndQuantity = async function (productId) {
