@@ -28,8 +28,6 @@ const { authorization, allowedTo } = require('../services/authService');
 
 const router = express.Router();
 
-// router.use(authorization);
-
 router.get('/getme', authorization, getLoggedUserData, getUser);
 router.put(
   '/changemypassword',
