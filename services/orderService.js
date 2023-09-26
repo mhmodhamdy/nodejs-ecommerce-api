@@ -1,4 +1,11 @@
 const asyncHandler = require('express-async-handler');
+// require('dotenv').config({ path: './.env' });
+const Stripe = require('stripe');
+
+const stripe = Stripe(
+  'sk_test_51NuCSzIS5ZmmIC2atQAD4DKBQXRCfjPPLT4v2JzSBNiBvKRoovH4M7rLYBNEggTcxxhpnkMdU7ISgsOS1rXb5Ivu00SW9K7u0d'
+);
+// const stripe = require('stripe')(process.env.STRIPE_SECRET);
 
 const Cart = require('../models/cartModel');
 const Product = require('../models/productModel');
@@ -72,21 +79,18 @@ exports.getOrderById = getOne(Order);
 // @route   PUT /api/orders/:orderId/pay
 // @access  Private Admin & Manager
 exports.updatePaidStatusToTrue = asyncHandler(async (req, res, next) => {
-  if (!req.params || !req.params.orderId) {
-    return next(new ApiError(`Please provide orderId`, 400));
-  }
   const order = await Order.findOneAndUpdate(
     { _id: req.params.orderId },
-    { isPaid: true, paidAt: Date.now() },
+    { iaPaid: true, paidAt: Date.now() },
     { new: true }
   );
   if (!order) throw new ApiError('No order found with that id!', 404);
   res.status(200).json({ success: true, data: order });
 });
 
-//desc    Update order delivered status to true
-//@route   PUT /api/orders/:orderId/delivered
-//@access  Private Admin & Manager
+//desc      Update order delivered status to true
+//@route    PUT /api/orders/:orderId/delivered
+//@access   Private Admin & Manager
 exports.updateDeliverdStatusToTrue = asyncHandler(async (req, res, next) => {
   if (!req.params || !req.params.orderId) {
     return next(new ApiError('Please provide orderId', 400));
@@ -100,4 +104,65 @@ exports.updateDeliverdStatusToTrue = asyncHandler(async (req, res, next) => {
     throw new ApiError('No order Found With That Id!', 404);
   }
   res.status(200).json({ success: true, data: order });
+});
+
+//desc      Get checkout session from stripe and send it as a response
+//@route    Get /api/orders/checkout-session/cartId
+//@access   Private User & Admin
+exports.checkoutSession = asyncHandler(async (req, res, next) => {
+  // App settings
+  const taxPrice = 0;
+  const shippingPrice = 0;
+  // Get cart depends on cart id
+  const cart = await Cart.findById(req.params.cartId);
+  if (!cart) {
+    res.status(401).json({ message: 'Cart not found' });
+  }
+  // Get order price depends on cart price "check if coupon apply"
+  const cartPrice = cart.totalPriceAfterDiscount
+    ? cart.totalPriceAfterDiscount
+    : cart.totalCartPrice;
+  const totalOrderPrice = cartPrice + taxPrice + shippingPrice;
+  // Create strip checkout session
+  const session = await stripe.checkout.sessions.create({
+    // paymentMethod: ['card'],
+    line_items: [
+      {
+        price_data: {
+          currency: 'egp',
+          product_data: {
+            name: req.user.name,
+          },
+          unit_amount: totalOrderPrice * 100,
+        },
+        quantity: 1,
+      },
+    ],
+    // [
+    //   {
+    //     price_data: {
+    //       currency: 'egp',
+    //       unit_amount: totalOrderPrice * 100,
+    //       product_data: { name: req.user.name },
+    //     },
+    //     quantity: 1,
+    //   },
+    // ],
+    // [
+    //   {
+    //     name: req.user.name,
+    //     amount: totalOrderPrice * 100,
+    //     currency: 'egp',
+    //     quantity: 1,
+    //   },
+    // ],
+    mode: 'payment',
+    success_url: `${req.protocol}://${req.get('host')}/orders`,
+    cancel_url: `${req.protocol}://${req.get('host')}/carts`,
+    customer_email: req.user.email,
+    client_reference_id: req.params.cartId,
+    metadata: req.body.shippingAddress,
+  });
+  // Send session to response
+  res.status(200).json({ status: 'Success', data: session });
 });

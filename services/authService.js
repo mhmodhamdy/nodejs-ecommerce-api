@@ -83,7 +83,7 @@ exports.authorization = asyncHandler(async (req, res, next) => {
   next();
 });
 
-// Authorization
+// Permision to access the route
 exports.allowedTo = (...roles) =>
   asyncHandler(async (req, res, next) => {
     if (!roles.includes(req.user.role)) {

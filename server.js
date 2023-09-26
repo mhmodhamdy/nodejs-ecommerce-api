@@ -3,6 +3,8 @@ const path = require('path');
 const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
+const cors = require('cors');
+const compression = require('compression');
 
 const dbConnection = require('./config/database');
 const mountRoutes = require('./routes');
@@ -11,11 +13,19 @@ const globalError = require('./middleware/errorMiddleware');
 
 dotenv.config({ path: 'config.env' });
 
-//connect with database
+// @desc    connect with database
 dbConnection();
-//ExpressApp
+// @desc    ExpressApp
 const app = express();
-//Middlewares
+
+// @desc    Enable domains to access the app
+app.use(cors());
+app.options('*', cors());
+
+// @desc    Compress all responses
+app.use(compression());
+
+// @desc    Middlewares
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'uploads')));
 
@@ -24,17 +34,17 @@ if (process.env.NODE_ENV === 'development') {
   console.log(`mode: ${process.env.NODE_ENV}`);
 }
 
-//Mount Routes
+// @desc    Mount Routes
 mountRoutes(app);
 
 app.all('*', (req, res, next) => {
   next(new ApiError(`can't find this route: ${req.originalUrl}`, 400));
 });
 
-//Global error handling middleware for express
+// @desc    Global error handling middleware for express
 app.use(globalError);
 
-//Handle rejections outside express
+// @desc    Handle rejections outside express
 process.on('unhandledRejection', (err) => {
   console.error(`UnhandledRejection Errors: ${err.name} | ${err.message}`);
   // eslint-disable-next-line no-use-before-define
