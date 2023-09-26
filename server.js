@@ -29,7 +29,8 @@ app.use(compression());
 // @desc    Checkout webhook
 app.post(
   '/webhook-checkout',
-  express.raw({ type: 'application/json' }, webhookCheckout)
+  express.raw({ type: 'application/json' }),
+  webhookCheckout
 );
 
 // @desc    Middlewares
