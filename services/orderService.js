@@ -89,7 +89,7 @@ exports.updatePaidStatusToTrue = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: order });
 });
 
-//desc      Update order delivered status to true
+//@desc     Update order delivered status to true
 //@route    PUT /api/orders/:orderId/delivered
 //@access   Private Admin & Manager
 exports.updateDeliverdStatusToTrue = asyncHandler(async (req, res, next) => {
@@ -107,7 +107,7 @@ exports.updateDeliverdStatusToTrue = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: order });
 });
 
-//desc      Get checkout session from stripe and send it as a response
+//@desc     Get checkout session from stripe and send it as a response
 //@route    Get /api/orders/checkout-session/cartId
 //@access   Private User & Admin
 exports.checkoutSession = asyncHandler(async (req, res, next) => {
@@ -186,6 +186,9 @@ const createCardOrder = async (session) => {
   }
 };
 
+//@desc     This webhook will run when stripe payment paid successfully
+//@route    Get /webhook-checkout
+//@access   Private User
 exports.webhookCheckout = asyncHandler(async (req, res, next) => {
   const sig = req.headers['stripe-signature'];
 
